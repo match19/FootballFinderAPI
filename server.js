@@ -19,6 +19,17 @@ const server = http.createServer(async (req, res) => {
     reqData = JSON.parse(Buffer.concat(buffers).toString());
   }
 
+  if(req.method == "OPTIONS"){ //CORS ERROR FIX
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Methods', '*')
+    res.setHeader('Access-Control-Allow-Headers', '*')
+    res.end();
+  }else{
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Methods', '*')
+    res.setHeader('Access-Control-Allow-Headers', '*')
+  }
+
   if(req.url == "/gui"){
     try {
       retval = await handler.handleRequest(reqData);
