@@ -1,27 +1,29 @@
 const http = require('http');
 
-const { Client } = require('pg')
-const client = new Client({
-    user: 'ttxwvksu',
-    host: 'abul.db.elephantsql.com',
-    database: 'ttxwvksu',
-    password: 'lB1FYYY7AfT-EO-k1ZK4maLDT_nxL522',
-    port: 5432,
-  })
-  client.connect()
-  
-
 const hostname = 'localhost';
 const port = 3000;
 
-const server = http.createServer((req, res) => {
-  console.log("url: "+ req.url);
+const handler = require('./requestHandler');
+
+const server = http.createServer(async (req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
-  client.query('SELECT * FROM ttxwvksu.public.orders o', (err, sqlRes) => {
-    res.end(JSON.stringify(sqlRes.rows));
 
-  })
+  const buffers = [];
+
+  for await (const chunk of req) {
+    buffers.push(chunk);
+  }
+
+  const reqData = JSON.parse(Buffer.concat(buffers).toString());
+
+  try {
+    retval = await handler.handleRequest(reqData);
+    res.end(JSON.stringify(retval));
+  } catch (error) {
+    res.statusCode = error.statusCode;
+    res.end(error.msg);
+  }
 });
 
 server.listen(port, hostname, () => {
