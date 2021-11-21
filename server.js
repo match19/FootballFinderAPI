@@ -8,22 +8,29 @@ const handler = require('./requestHandler');
 const server = http.createServer(async (req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
+  let reqData = "";
+  if(req.method == "POST"){
+    const buffers = [];
 
-  const buffers = [];
+    for await (const chunk of req) {
+      buffers.push(chunk);
+    }
 
-  for await (const chunk of req) {
-    buffers.push(chunk);
+    reqData = JSON.parse(Buffer.concat(buffers).toString());
   }
 
-  const reqData = JSON.parse(Buffer.concat(buffers).toString());
-
-  try {
-    retval = await handler.handleRequest(reqData);
-    res.end(JSON.stringify(retval));
-  } catch (error) {
-    res.statusCode = error.statusCode;
-    res.end(error.msg);
+  if(req.url == "/gui"){
+    try {
+      retval = await handler.handleRequest(reqData);
+      res.end(JSON.stringify(retval));
+    } catch (error) {
+      res.statusCode = error.statusCode;
+      res.end(error.msg);
+    }
   }
+  res.statusCode = 400;
+  res.end();
+  
 });
 
 server.listen(port, hostname, () => {
