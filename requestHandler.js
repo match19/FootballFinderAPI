@@ -1,5 +1,8 @@
 const sqlCon = require('./sql');
 
+const bcrypt = require('bcryptjs');
+const rounds = 10;
+
 const sqlStatements = require('./sql-statements');
 
 module.exports.handleRequest = async function (data){
@@ -21,7 +24,7 @@ module.exports.handleRequest = async function (data){
         case "createuser":
             return await createUser(data.user);
         case "updateuser":
-            return await updateUser(data.user);
+            return await updateUser(data.user, data.change_pass);
         case "packorder":
             return await packOrder(data.id);
     }
@@ -29,22 +32,26 @@ module.exports.handleRequest = async function (data){
 }
 
 async function getOrdersBySalesman(salesman_id){
-    orders = await sqlCon.query(sqlStatements.getOrdersBySalesman, [salesman_id]);
+    const orders = await sqlCon.query(sqlStatements.getOrdersBySalesman, [salesman_id]);
     return orders.rows;
 }
 
 async function getOrders(){
-    orders = await sqlCon.query(sqlStatements.getAllOrders);
+    const orders = await sqlCon.query(sqlStatements.getAllOrders);
     return orders.rows;
 }
 
-async function userLogin(user, pass){
-    orders = await sqlCon.query(sqlStatements.userLogin, [user, pass]);
-    return orders.rows[0];
+async function userLogin(username, password){
+    const res = await sqlCon.query(sqlStatements.userLogin, [username]);
+    const user = res.rows[0];
+
+    if(user != null && bcrypt.compareSync(password, user.password)){
+        return user;
+    }
 }
 
 async function getProducts(){
-    orders = await sqlCon.query(sqlStatements.getAllProducts);
+    const orders = await sqlCon.query(sqlStatements.getAllProducts);
     return orders.rows;
 }
 
@@ -53,21 +60,28 @@ async function submitOrder(order){
 }
 
 async function getUsers(){
-    users = await sqlCon.query(sqlStatements.getUsers, []);
+    const users = await sqlCon.query(sqlStatements.getUsers, []);
     return users.rows;
 }
 
 async function getUsersTypes(){
-    users = await sqlCon.query(sqlStatements.getUsersTypes, []);
+    const users = await sqlCon.query(sqlStatements.getUsersTypes, []);
     return users.rows;
 }
 
 async function createUser(user){
-    await sqlCon.query(sqlStatements.createUser, [user.username, user.password, user.type_id]);
+    const hash = bcrypt.hashSync(user.password, rounds);
+
+    await sqlCon.query(sqlStatements.createUser, [user.username, hash, user.type_id]);
 }
 
-async function updateUser(user){
-    await sqlCon.query(sqlStatements.updateUser, [user.username, user.password, user.type_id, user.id]);
+async function updateUser(user, change_pass){
+    if(change_pass === true){
+        const hash = bcrypt.hashSync(user.password, rounds);
+        await sqlCon.query(sqlStatements.updateUser, [user.username, hash, user.type_id, user.id]);
+    }else{
+        await sqlCon.query(sqlStatements.updateUserNoPassword, [user.username, user.type_id, user.id]);
+    }
 }
 
 async function packOrder(id){
