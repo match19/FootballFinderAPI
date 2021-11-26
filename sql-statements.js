@@ -10,7 +10,7 @@ module.exports.getAllOrdersBySalesman = `SELECT id, address, manager, products_o
 module.exports.userLogin = `SELECT id, username, password, type_id 
                                 FROM public.users WHERE username = $1;`
 
-module.exports.getAllProducts = `SELECT id, name, amount 
+module.exports.getAllProducts = `SELECT id, name, amount, price 
                                 FROM public.products;`
 
 module.exports.submitOrder = `INSERT INTO public.orders (address, manager, products_ordered, salesman_id, store_name)
