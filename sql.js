@@ -14,6 +14,7 @@ module.exports.query = async function(query, param = null) {
         client.end()
         return res;
     } catch (error) {
+        console.log(error)
         throw {statusCode: 500, msg: "Internal server error"};
     }
     
