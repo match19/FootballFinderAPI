@@ -1,0 +1,1 @@
+run command: node server.js to start the server
