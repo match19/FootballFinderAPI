@@ -1,6 +1,6 @@
 const http = require('http');
 
-const port = 3000;
+const port = process.env.PORT || 5050;
 
 const handler = require('./requestHandler');
 
@@ -44,5 +44,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(port, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+  console.log(`Server running at ${port}`);
 });
