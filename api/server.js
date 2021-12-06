@@ -48,7 +48,5 @@ app.get('/api', (req, res) => {
   res.end(`Hello!`);
 });
 
-app.listen(port, () => {
-  console.log("hello")
-});
+
 module.exports = app;
