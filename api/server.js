@@ -29,7 +29,7 @@ app.post('/api', async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', '*')
   }
 
-  if(req.url == "/gui"){
+  if(req.url == "/api"){
     try {
       retval = await handler.handleRequest(reqData);
       res.end(JSON.stringify(retval));
@@ -48,4 +48,7 @@ app.get('/api', (req, res) => {
   res.end(`Hello!`);
 });
 
+app.listen(port, () => {
+  console.log("hello")
+});
 module.exports = app;
