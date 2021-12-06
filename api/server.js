@@ -5,6 +5,7 @@ const port = process.env.PORT || 5050;
 const handler = require('../requestHandler');
 
 app.post('/api', async (req, res) => {
+  res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
   let reqData = "";
@@ -44,6 +45,7 @@ app.post('/api', async (req, res) => {
 });
 
 app.get('/api', (req, res) => {
+  res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
   res.setHeader('Content-Type', 'application/json');
   res.end(`Hello!`);
 });
