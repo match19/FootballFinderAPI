@@ -1,17 +1,26 @@
 {
-  "name": "server",
+  "name": "express-vercel",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node api/server.js"
+  "description": "Deploy express js to vercel.",
+  "main": "index.js",
+  "engines": {
+    "node" : "14.x"
   },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hatuanem199801/express-vercel.git"
+  },
+  "keywords": [],
   "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hatuanem199801/express-vercel/issues"
+  },
+  "homepage": "https://github.com/hatuanem199801/express-vercel#readme",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "express": "^4.17.1",
-    "pg": "^8.7.1"
+    "express": "^4.17.1"
   }
 }

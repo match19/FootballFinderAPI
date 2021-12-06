@@ -1,1 +1,2 @@
-run command: node server.js to start the server
+# express-vercel
+Deploy express js to vercel.
