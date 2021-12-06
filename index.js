@@ -1,6 +1,5 @@
 const http = require('http');
 
-const hostname = 'localhost';
 const port = process.env.PORT || 8080;
 
 const handler = require('./requestHandler');
@@ -33,6 +32,7 @@ const server = http.createServer(async (req, res) => {
   if(req.url == "/gui"){
     try {
       retval = await handler.handleRequest(reqData);
+      retval = {success: retval};
       res.end(JSON.stringify(retval));
     } catch (error) {
       res.statusCode = error.statusCode;
@@ -45,5 +45,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(port, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+  console.log(`Server running at ${port}`);
 });
