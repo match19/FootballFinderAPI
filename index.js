@@ -1,10 +1,49 @@
-const express = require("express");
-const app = express();
-const product = require("./api/product");
+const http = require('http');
 
-app.use(express.json({ extended: false }));
+const hostname = 'localhost';
+const port = process.env.PORT || 8080;
 
-app.use("/api/product", product);
+const handler = require('./requestHandler');
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => console.log(`Server is running in port ${PORT}`));
+const server = http.createServer(async (req, res) => {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'application/json');
+  let reqData = "";
+  if(req.method == "POST"){
+    const buffers = [];
+
+    for await (const chunk of req) {
+      buffers.push(chunk);
+    }
+
+    reqData = JSON.parse(Buffer.concat(buffers).toString());
+  }
+
+  if(req.method == "OPTIONS"){ //CORS ERROR FIX
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Methods', '*')
+    res.setHeader('Access-Control-Allow-Headers', '*')
+    res.end();
+  }else{
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Methods', '*')
+    res.setHeader('Access-Control-Allow-Headers', '*')
+  }
+
+  if(req.url == "/gui"){
+    try {
+      retval = await handler.handleRequest(reqData);
+      res.end(JSON.stringify(retval));
+    } catch (error) {
+      res.statusCode = error.statusCode;
+      res.end(error.msg);
+    }
+  }
+  res.statusCode = 400;
+  res.end();
+  
+});
+
+server.listen(port, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});
