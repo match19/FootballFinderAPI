@@ -32,7 +32,7 @@ const server = http.createServer(async (req, res) => {
   if(req.url == "/gui"){
     try {
       retval = await handler.handleRequest(reqData);
-      retval = {success: retval};
+      retval = {success: retval, error: "none"};
       res.end(JSON.stringify(retval));
     } catch (error) {
       res.statusCode = error.statusCode;
