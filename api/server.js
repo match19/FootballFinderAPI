@@ -1,10 +1,10 @@
-const http = require('http');
+const app = require('express')();
 
 const port = process.env.PORT || 5050;
 
-const handler = require('./requestHandler');
+const handler = require('../requestHandler');
 
-const server = http.createServer(async (req, res) => {
+app.post('/api', async (req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
   let reqData = "";
@@ -43,6 +43,9 @@ const server = http.createServer(async (req, res) => {
   
 });
 
-server.listen(port, () => {
-  console.log(`Server running at ${port}`);
+app.get('/api', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.end(`Hello!`);
 });
+
+module.exports = app;
