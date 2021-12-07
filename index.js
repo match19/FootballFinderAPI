@@ -1,6 +1,6 @@
 const http = require('http');
 
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 
 const handler = require('./requestHandler');
 
@@ -29,14 +29,14 @@ const server = http.createServer(async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', '*')
   }
 
-  if(req.url == "/gui"){
+  if(req.url == "/footballfinder"){
     try {
       retval = await handler.handleRequest(reqData);
-      retval = {success: retval, error: "hello"};
+      retval = {data: retval};
       res.end(JSON.stringify(retval));
     } catch (error) {
       res.statusCode = error.statusCode;
-      res.end(error.msg);
+      res.end(JSON.stringify({error: error.msg}));
     }
   }
   res.statusCode = 400;

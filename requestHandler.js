@@ -7,88 +7,86 @@ const sqlStatements = require('./sql-statements');
 
 module.exports.handleRequest = async function (data){
     switch(data.case){
-        case "getorders":
-            return await getOrders();
-        case "getordersbysalesman":
-            return await getOrdersBySalesman(data.salesman_id);
+        case "getfields":
+            return await getFields();
+        case "getevents":
+            return await getEvents();
+        case "geteventstoday":
+            return await getEventsToday();
+        case "geteventsonfield":
+            return await getEventsOnField(data.field_id);
+        case "newevent":
+            return await newEvent(data.field_id, data.max_particpants, data.owner, data.desc, data.start, data.end);
+        case "newuser":
+            return await newUser(data.username, data.password);
         case "userlogin":
             return await userLogin(data.username, data.password);
-        case "getproducts":
-            return await getProducts();
-        case "submitorder":
-            return await submitOrder(data.order);
-        case "getusers":
-            return await getUsers();
-        case "getusertypes":
-            return await getUsersTypes();
-        case "createuser":
-            return await createUser(data.user);
-        case "updateuser":
-            return await updateUser(data.user, data.change_pass);
-        case "packorder":
-            return await packOrder(data.id);
     }
 
 }
 
-async function getOrdersBySalesman(salesman_id){
-    const orders = await sqlCon.query(sqlStatements.getOrdersBySalesman, [salesman_id]);
-    return orders.rows;
+async function getFields(){
+    const fields = await sqlCon.query(sqlStatements.getFields);
+    return fields.rows;
 }
 
-async function getOrders(){
-    const orders = await sqlCon.query(sqlStatements.getAllOrders);
-    return orders.rows;
+async function getEvents(){
+    const events = await sqlCon.query(sqlStatements.getEvents);
+    return events.rows;
+}
+
+async function getEventsToday(){
+    const events = await sqlCon.query(sqlStatements.getEventsToday);
+    return events.rows;
+}
+
+async function getEventsOnField(field_id){
+    if(!field_id){
+        throw {statusCode: 400, msg: "Bad request"};
+    }
+    const events = await sqlCon.query(sqlStatements.getEventsOnField, [field_id]);
+    return events.rows;
+}
+
+async function newEvent(field_id, max_particpants, owner, desc, start, end){
+    if(!field_id || !max_particpants || !owner || !desc || !start || !end){
+        throw {statusCode: 400, msg: "Bad request"};
+    }
+    const event = await sqlCon.query(sqlStatements.newEvent, [field_id, max_particpants, owner, desc, start, end]);
+    return {eventId: event.rows[0].id};
+}
+
+async function newUser(username, password){
+    if(!username || !password){
+        throw {statusCode: 400, msg: "Bad request"};
+    }
+    const hash = bcrypt.hashSync(password, rounds);
+    try {
+        const user = await sqlCon.query(sqlStatements.newUser, [username, hash]);
+        return {user: user.rows[0]};
+    } catch (error) {
+        if(error.error.routine === "_bt_check_unique"){
+            throw {statusCode: 409, msg: "Username is already taken"};
+        }else{
+            throw error;
+        }
+    }
+    
 }
 
 async function userLogin(username, password){
+    if(!username || !password){
+        throw {statusCode: 400, msg: "Bad request"};
+    }
     const res = await sqlCon.query(sqlStatements.userLogin, [username]);
     const user = res.rows[0];
 
     if(user != null && bcrypt.compareSync(password, user.password)){
-        return user;
-    }
-}
-
-async function getProducts(){
-    const orders = await sqlCon.query(sqlStatements.getAllProducts);
-    return orders.rows;
-}
-
-async function submitOrder(order){
-    await sqlCon.query(sqlStatements.submitOrder, [order.address, order.manager, JSON.stringify(order.products_ordered), order.salesman_id, order.store_name]);
-}
-
-async function getUsers(){
-    const users = await sqlCon.query(sqlStatements.getUsers, []);
-    return users.rows;
-}
-
-async function getUsersTypes(){
-    const users = await sqlCon.query(sqlStatements.getUsersTypes, []);
-    return users.rows;
-}
-
-async function createUser(user){
-    const hash = bcrypt.hashSync(user.password, rounds);
-
-    await sqlCon.query(sqlStatements.createUser, [user.username, hash, user.type_id]);
-}
-
-async function updateUser(user, change_pass){
-    if(change_pass === true){
-        const hash = bcrypt.hashSync(user.password, rounds);
-        await sqlCon.query(sqlStatements.updateUser, [user.username, hash, user.type_id, user.id]);
+        return {user: user};
     }else{
-        await sqlCon.query(sqlStatements.updateUserNoPassword, [user.username, user.type_id, user.id]);
+        throw {statusCode: 401, msg: "Invalid login"};
+
     }
+
 }
-
-async function packOrder(id){
-    await sqlCon.query(sqlStatements.packOrder, [id]);
-}
-
-
-
-
 

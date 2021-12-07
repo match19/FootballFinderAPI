@@ -1,28 +1,15 @@
-module.exports.getOrdersBySalesman = `SELECT id, address, manager, products_ordered, salesman_id, store_name, packed
-                                        FROM public.orders WHERE salesman_id = $1 ORDER BY id ASC;`
+module.exports.getFields = `SELECT * FROM fields;`
 
-module.exports.getAllOrders = `SELECT id, address, manager, products_ordered, salesman_id, store_name, packed
-                                        FROM public.orders ORDER BY id ASC;`
+module.exports.getEvents = `SELECT * FROM events;`
 
-module.exports.getAllOrdersBySalesman = `SELECT id, address, manager, products_ordered, salesman_id, store_name, packed
-                                        FROM public.orders WHERE salesman_id = $1 ORDER BY id ASC;`
+module.exports.getEventsToday = `SELECT * FROM events WHERE DATE(start_time) = DATE(NOW())` 
 
-module.exports.userLogin = `SELECT id, username, password, type_id 
-                                FROM public.users WHERE username = $1;`
+module.exports.getEventsOnField = `SELECT * FROM events WHERE field = $1` 
 
-module.exports.getAllProducts = `SELECT id, name, amount, price 
-                                FROM public.products;`
+module.exports.newEvent = `INSERT INTO events (field, max_participants, owner, description, start_time, end_time)
+VALUES($1,$2,$3,$4,$5,$6) RETURNING id;` 
 
-module.exports.submitOrder = `INSERT INTO public.orders (address, manager, products_ordered, salesman_id, store_name)
-                            VALUES($1, $2, $3::json, $4, $5);`
-module.exports.getUsers = `SELECT id, username, (SELECT NULL AS password), type_id, type_name FROM public.users_vw`
+module.exports.newUser = `INSERT INTO users (username, password) VALUES($1, $2) RETURNING id, username, password;`
 
-module.exports.getUsersTypes = `SELECT id, type_name FROM public.user_types`
-
-module.exports.createUser = `INSERT INTO public.users (username, password, type_id) VALUES($1, $2, $3);`
-
-module.exports.updateUser = `UPDATE public.users SET username=$1, password=$2, type_id=$3 WHERE id=$4;`
-
-module.exports.updateUserNoPassword = `UPDATE public.users SET username=$1, type_id=$2 WHERE id=$3;`
-
-module.exports.packOrder = `UPDATE public.orders SET packed=true WHERE id=$1;`
+module.exports.userLogin = `SELECT id, username, password 
+                                FROM users WHERE username = $1;`
