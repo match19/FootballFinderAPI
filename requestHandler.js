@@ -44,7 +44,7 @@ async function getEventsOnFieldToday(field_id){
     if(!field_id){
         throw {statusCode: 400, msg: "Bad request"};
     }
-    const events = await sqlCon.query(sqlStatements.getEventsOnField, [field_id]);
+    const events = await sqlCon.query(sqlStatements.getEventsOnFieldToday, [field_id]);
     return events.rows;
 }
 
