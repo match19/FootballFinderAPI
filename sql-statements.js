@@ -1,10 +1,10 @@
 module.exports.getFields = `SELECT * FROM fields;`
 
-module.exports.getEvents = `SELECT * FROM events;`
+module.exports.getEvents = `SELECT id, field, max_participants, "owner", description, start_time, end_time FROM events;`
 
-module.exports.getEventsToday = `SELECT * FROM events WHERE DATE(start_time) = DATE(NOW())` 
+module.exports.getEventsToday = `SELECT id, field, max_participants, "owner", description, start_time, end_time FROM events WHERE DATE(start_time) = DATE(NOW())` 
 
-module.exports.getEventsOnField = `SELECT * FROM events WHERE field = $1` 
+module.exports.getEventsOnFieldToday = `SELECT id, field, max_participants, "owner", description, start_time, end_time FROM events WHERE field = $1 AND DATE(start_time) = DATE(NOW())` 
 
 module.exports.newEvent = `INSERT INTO events (field, max_participants, owner, description, start_time, end_time)
 VALUES($1,$2,$3,$4,$5,$6) RETURNING id;` 

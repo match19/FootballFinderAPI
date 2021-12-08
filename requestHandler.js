@@ -13,8 +13,8 @@ module.exports.handleRequest = async function (data){
             return await getEvents();
         case "geteventstoday":
             return await getEventsToday();
-        case "geteventsonfield":
-            return await getEventsOnField(data.field_id);
+        case "geteventsonfieldtoday":
+            return await getEventsOnFieldToday(data.field_id);
         case "newevent":
             return await newEvent(data.field_id, data.max_particpants, data.owner, data.desc, data.start, data.end);
         case "newuser":
@@ -40,7 +40,7 @@ async function getEventsToday(){
     return events.rows;
 }
 
-async function getEventsOnField(field_id){
+async function getEventsOnFieldToday(field_id){
     if(!field_id){
         throw {statusCode: 400, msg: "Bad request"};
     }
@@ -76,7 +76,7 @@ async function newUser(username, password){
 
 async function userLogin(username, password){
     if(!username || !password){
-        throw {statusCode: 400, msg: "Bad request"};
+        throw {statusCode: 401, msg: "Invalid login"};
     }
     const res = await sqlCon.query(sqlStatements.userLogin, [username]);
     const user = res.rows[0];
@@ -85,7 +85,6 @@ async function userLogin(username, password){
         return {user: user};
     }else{
         throw {statusCode: 401, msg: "Invalid login"};
-
     }
 
 }
