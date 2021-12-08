@@ -52,8 +52,11 @@ async function newEvent(field_id, max_particpants, owner, desc, start, end){
     if(!field_id || !max_particpants || !owner || !desc || !start || !end){
         throw {statusCode: 400, msg: "Bad request"};
     }
-    const event = await sqlCon.query(sqlStatements.newEvent, [field_id, max_particpants, owner, desc, start, end]);
-    return {eventId: event.rows[0].id};
+    const eventID = await sqlCon.query(sqlStatements.newEvent, [field_id, max_particpants, owner, desc, start, end]);
+    let id = eventID.rows[0].id;
+
+    const event = await sqlCon.query(sqlStatements.getEventById, [id]);
+    return {event: event.rows[0]};
 }
 
 async function newUser(username, password){

@@ -1,10 +1,12 @@
-module.exports.getFields = `SELECT * FROM fields;`
+module.exports.getFields = `SELECT id, description, "location", lat, lon, "type", "owner", event_today FROM fields_vw;`
 
-module.exports.getEvents = `SELECT id, field, max_participants, "owner", description, start_time, end_time FROM events;`
+module.exports.getEvents = `SELECT id, field, max_participants, "owner", description, start_time, end_time, owner_username FROM events_vw;`
 
-module.exports.getEventsToday = `SELECT id, field, max_participants, "owner", description, start_time, end_time FROM events WHERE DATE(start_time) = DATE(NOW())` 
+module.exports.getEventById = `SELECT id, field, max_participants, "owner", description, start_time, end_time, owner_username FROM events_vw WHERE id = $1;`
 
-module.exports.getEventsOnFieldToday = `SELECT id, field, max_participants, "owner", description, start_time, end_time FROM events WHERE field = $1 AND DATE(start_time) = DATE(NOW())` 
+module.exports.getEventsToday = `SELECT id, field, max_participants, "owner", description, start_time, end_time, owner_username FROM events_vw WHERE DATE(start_time) = DATE(NOW())` 
+
+module.exports.getEventsOnFieldToday = `SELECT id, field, max_participants, "owner", description, start_time, end_time, owner_username FROM events_vw WHERE field = $1 AND DATE(start_time) = DATE(NOW())` 
 
 module.exports.newEvent = `INSERT INTO events (field, max_participants, owner, description, start_time, end_time)
 VALUES($1,$2,$3,$4,$5,$6) RETURNING id;` 
