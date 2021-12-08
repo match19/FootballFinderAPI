@@ -8,8 +8,7 @@ module.exports.getEventsToday = `SELECT id, field, max_participants, "owner", de
 
 module.exports.getEventsOnFieldToday = `SELECT id, field, max_participants, "owner", description, start_time, end_time, owner_username FROM events_vw WHERE field = $1 AND DATE(start_time) = DATE(NOW())` 
 
-module.exports.newEvent = `INSERT INTO events (field, max_participants, owner, description, start_time, end_time)
-VALUES($1,$2,$3,$4,$5,$6) RETURNING id;` 
+module.exports.newEvent = `SELECT new_event($1, $2, $3, $4, $5, $6) AS id;` 
 
 module.exports.newUser = `INSERT INTO users (username, password) VALUES($1, $2) RETURNING id, username, password;`
 
