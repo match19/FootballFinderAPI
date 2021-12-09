@@ -15,6 +15,8 @@ module.exports.handleRequest = async function (data){
             return await getEventsToday();
         case "geteventsonfieldtoday":
             return await getEventsOnFieldToday(data.field_id);
+        case "geteventbyid":
+            return await getEventByID(data.id);
         case "newevent":
             return await newEvent(data.field_id, data.max_particpants, data.owner, data.desc, data.start, data.end);
         case "newuser":
@@ -46,6 +48,11 @@ async function getEventsOnFieldToday(field_id){
     }
     const events = await sqlCon.query(sqlStatements.getEventsOnFieldToday, [field_id]);
     return events.rows;
+}
+
+async function getEventByID(id){
+    const event = await sqlCon.query(sqlStatements.getEventById, [id]);
+    return {event: event.rows[0]};
 }
 
 async function newEvent(field_id, max_particpants, owner, desc, start, end){
