@@ -56,7 +56,12 @@ async function newEvent(field_id, max_particpants, owner, desc, start, end){
     let id = eventID.rows[0].id;
 
     const event = await sqlCon.query(sqlStatements.getEventById, [id]);
-    return {event: event.rows[0]};
+
+    if(event.rows[0] == null){
+        throw {statusCode: 409, msg: "Event overlaps another event"};
+    }else{
+        return {event: event.rows[0]};
+    }
 }
 
 async function newUser(username, password){
