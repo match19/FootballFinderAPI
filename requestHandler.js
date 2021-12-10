@@ -15,10 +15,14 @@ module.exports.handleRequest = async function (data){
             return await getEventsToday();
         case "geteventsonfieldtoday":
             return await getEventsOnFieldToday(data.field_id);
+        case "getjoinedevents":
+            return await getJoinedEventsOnUser(data.user_id);
         case "geteventbyid":
             return await getEventByID(data.id);
         case "newevent":
             return await newEvent(data.field_id, data.max_particpants, data.owner, data.desc, data.start, data.end);
+        case "joinevent":
+            return await joinEvent(data.event_id, data.user_id);
         case "newuser":
             return await newUser(data.username, data.password);
         case "userlogin":
@@ -50,6 +54,14 @@ async function getEventsOnFieldToday(field_id){
     return events.rows;
 }
 
+async function getJoinedEventsOnUser(user_id){
+    if(!user_id){
+        throw {statusCode: 400, msg: "Bad request"};
+    }
+    const events = await sqlCon.query(sqlStatements.getJoinedEventsOnUser, [user_id]);
+    return events.rows;
+}
+
 async function getEventByID(id){
     const event = await sqlCon.query(sqlStatements.getEventById, [id]);
     return {event: event.rows[0]};
@@ -68,6 +80,19 @@ async function newEvent(field_id, max_particpants, owner, desc, start, end){
         throw {statusCode: 409, msg: "Event overlaps another event"};
     }else{
         return {event: event.rows[0]};
+    }
+}
+
+async function joinEvent(event_id, user_id){
+    if(!event_id || !user_id){
+        throw {statusCode: 400, msg: "Bad request"};
+    }
+    const joined = await sqlCon.query(sqlStatements.joinEvent, [event_id, user_id]);
+
+    if(joined.rows[0].joined){
+        return "Event joined";
+    }else{
+        throw {statusCode: 409, msg: "Already joined or too many participants"};
     }
 }
 
